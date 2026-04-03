@@ -37,7 +37,7 @@ router.post("/message", async (req, res) => {
     try {
       const mlResponse = await axios.post(
         `${process.env.ML_SERVICE_URL}/predict`,
-        req.body
+        req.body,
       );
       mlData = mlResponse.data;
     } catch (err) {
@@ -104,7 +104,6 @@ Give short, practical, step-by-step answers.
       reply,
       ml: mlData,
     });
-
   } catch (err) {
     console.error("AI Assistant Error:", err);
     res.status(500).json({
