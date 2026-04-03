@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
+import axios from "axios";
 
 dotenv.config();
 const router = express.Router();
@@ -29,6 +30,20 @@ router.post("/message", async (req, res) => {
         success: false,
         message: "Message is required",
       });
+
+    // 🔥 ML CALL START
+    let mlData = null;
+
+    try {
+      const mlResponse = await axios.post(
+        `${process.env.ML_SERVICE_URL}/predict`,
+        req.body
+      );
+      mlData = mlResponse.data;
+    } catch (err) {
+      console.log("ML Error:", err.message);
+    }
+    // 🔥 ML CALL END
 
     const systemPrompt = `
 You are an AI Farming Assistant.  
@@ -65,7 +80,11 @@ Give short, practical, step-by-step answers.
         data?.candidates?.[0]?.content?.parts?.[0]?.text ||
         "⚠️ No content returned.";
 
-      return res.json({ success: true, reply });
+      return res.json({
+        success: true,
+        reply,
+        ml: mlData,
+      });
     }
 
     console.log("Gemini 2.0 Flash Error >>", data.error);
@@ -80,7 +99,11 @@ Give short, practical, step-by-step answers.
       data?.candidates?.[0]?.content?.parts?.[0]?.text ||
       "⚠️ AI unable to generate a response.";
 
-    return res.json({ success: true, reply });
+    return res.json({
+      success: true,
+      reply,
+      ml: mlData,
+    });
 
   } catch (err) {
     console.error("AI Assistant Error:", err);
