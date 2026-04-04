@@ -38,4 +38,9 @@ app.use("/api/assistant", assistantRoutes);     // AI Farming Assistant route
 // Health check
 app.get("/", (req, res) => res.send("Smart Farming Assistant Backend Running"));
 
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 export default app;
